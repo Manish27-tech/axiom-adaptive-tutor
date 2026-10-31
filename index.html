@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AXIOM · Adaptive Exam Lab</title>
+<meta name="description" content="Neuro-symbolic adaptive exam-prep tutor: 3D knowledge graph, parameterised study deck, adaptive testing arena, exam vault." />
+<link rel="stylesheet" href="css/styles.css?v=2" />
+</head>
+<body>
+
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+<div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+<div class="grain" aria-hidden="true"></div>
+
+<svg class="sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-graph" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="17" r="2.4"/><circle cx="19" cy="17" r="2.4"/><circle cx="12" cy="12" r="1.6"/><path d="M12 7.4v3M10.6 12.9 6.6 15.6M13.4 12.9l4 2.7"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15M19 18v3H6.5"/><path d="M8 7.5h7M8 11h5"/></symbol>
+  <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="m7 9 3 3-3 3M13 15h4"/></symbol>
+  <symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4"/></symbol>
+  <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M2 12h4l2.5-7 4 14 3-9 2 2h4.5"/></symbol>
+  <symbol id="i-mesh" viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><circle cx="4.5" cy="17" r="2"/><circle cx="19.5" cy="17" r="2"/><circle cx="12" cy="12" r="2"/><path d="M12 6v4M10.4 13.2 6.2 15.8M13.6 13.2l4.2 2.6M6.5 17h11"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4.5 4.5"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4.5 13.5H11l-1 8.5L19.5 10H13z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.4 2"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 22c4 0 7-2.7 7-6.6 0-4.6-4.3-7.3-4.3-11.4-2 1.2-3.2 3-3.2 5.3 0 1.4.4 2.4-.7 2.4-1 0-1.6-1.4-1.8-2.7-1.3 1.7-4 4-4 7.1C5 19.3 8 22 12 22z"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2.5 14 9l6.5 2-6.5 2-2 6.5-2-6.5L3.5 11 10 9z"/><path d="M19 3.5v3M17.5 5h3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m4.5 12.5 5 5 10-11"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 4.5 20 12 8 19.5z"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5M3 17.5l9 5 9-5"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h13M13 6.5l5.5 5.5L13 17.5"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m8 5 7 7-7 7"/></symbol>
+  <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4.5L3 9M4 13a8 8 0 0 0 14 4.5L21 15"/><path d="M3 4v5h5M21 20v-5h-5"/></symbol>
+  <symbol id="i-route" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2.2"/><circle cx="19" cy="18" r="2.2"/><path d="M7.2 6h5.3a3.5 3.5 0 0 1 0 7h-1a3.5 3.5 0 0 0 0 7h5.3"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2.5 20 6v6c0 5-3.4 8-8 9.5C7.4 20 4 17 4 12V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+</svg>
+
+<div class="app">
+
+  <!-- ══════════════ RAIL ══════════════ -->
+  <aside class="rail">
+    <div class="brand">
+      <div class="logo3d" aria-hidden="true">
+        <div class="cube">
+          <span class="f f1"></span><span class="f f2"></span><span class="f f3"></span>
+          <span class="f f4"></span><span class="f f5"></span><span class="f f6"></span>
+        </div>
+      </div>
+      <div class="brand-txt"><b>AXIOM</b><small>adaptive exam lab</small></div>
+    </div>
+
+    <nav class="nav" id="nav">
+      <button class="nav-item is-active" data-view="graph"><svg class="ic"><use href="#i-graph"/></svg><span>Knowledge Graph</span><em>01</em></button>
+      <button class="nav-item" data-view="learn"><svg class="ic"><use href="#i-book"/></svg><span>Study Anything</span><em>02</em></button>
+      <button class="nav-item" data-view="study"><svg class="ic"><use href="#i-book"/></svg><span>Study Deck</span><em>03</em></button>
+      <button class="nav-item" data-view="arena"><svg class="ic"><use href="#i-terminal"/></svg><span>Testing Arena</span><em>04</em></button>
+      <button class="nav-item" data-view="vault"><svg class="ic"><use href="#i-archive"/></svg><span>Exam Vault</span><em>05</em></button>
+      <button class="nav-item" data-view="diag"><svg class="ic"><use href="#i-pulse"/></svg><span>Diagnostics</span><em>06</em></button>
+      <button class="nav-item" data-view="mesh"><svg class="ic"><use href="#i-mesh"/></svg><span>Peer Mesh</span><em>07</em></button>
+    </nav>
+
+    <div class="rail-foot">
+      <div class="mesh-chip" id="mesh-chip" title="Zero-knowledge peer mesh status">
+        <span class="dot"></span><span id="mesh-chip-txt">mesh online</span>
+      </div>
+      <button class="profile" id="profile-btn" title="Learner profile">
+        <span class="avatar">AR</span>
+        <span class="profile-txt"><b>Aarav R.</b><small id="profile-rank">Rank · Contender</small></span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ══════════════ MAIN ══════════════ -->
+  <main class="main">
+    <header class="topbar">
+      <div class="top-left">
+        <button class="icon-btn" id="menu-btn" aria-label="Menu"><svg class="ic"><use href="#i-layers"/></svg></button>
+        <div class="crumb"><span id="crumb-a">Command</span><i>/</i><b id="crumb-b">Knowledge Graph</b></div>
+      </div>
+      <div class="top-right">
+        <button class="searchbtn" id="search-btn">
+          <svg class="ic"><use href="#i-search"/></svg>
+          <span>Search concepts, papers, bugs…</span>
+          <kbd>⌘K</kbd>
+        </button>
+        <div class="stat-pill" title="Study streak">
+          <svg class="ic"><use href="#i-flame"/></svg><b id="streak-n">12</b><span>day streak</span>
+        </div>
+        <div class="xp">
+          <div class="xp-top"><span>LVL <b id="lvl">7</b></span><span id="xp-txt">2 480 / 3 000 XP</span></div>
+          <div class="xp-bar"><i id="xp-fill" style="width:82%"></i></div>
+        </div>
+        <button class="icon-btn" id="sync-btn" title="Sync"><svg class="ic"><use href="#i-sync"/></svg></button>
+      </div>
+    </header>
+
+    <div class="views" id="views">
+
+      <!-- ══════ 00 · LEARN ANYTHING ══════ -->
+      <section class="view" data-view="learn">
+        <div class="view-head">
+          <div class="vh-l">
+            <p class="eyebrow"><span class="live"></span> Study anything · adaptive roadmap</p>
+            <h1>Pick a topic. <span class="grad">Pick a level.</span> Get a roadmap.</h1>
+            <p class="sub">Type any subject. Choose beginner, medium or master. You get an in-depth, line-by-line roadmap with references — offline for curated topics, or generated live with your own API key.</p>
+          </div>
+        </div>
+
+        <div class="learn-grid">
+          <aside class="panel learn-input">
+            <div class="panel-head"><span>Topic & level</span></div>
+            <label class="learn-label">Topic</label>
+            <div class="search-field" style="margin-bottom:12px">
+              <svg class="ic"><use href="#i-search"/></svg>
+              <input id="learn-topic" placeholder="e.g. Python, Machine Learning, SQL, Physics…" />
+            </div>
+
+            <label class="learn-label">Starting level</label>
+            <div class="level-seg" id="level-seg">
+              <button data-level="beginner" class="is-active">Beginner</button>
+              <button data-level="medium">Medium</button>
+              <button data-level="master">Master</button>
+            </div>
+
+            <label class="learn-label">API key (optional, for any topic)</label>
+            <input id="learn-key" type="password" class="learn-key" placeholder="sk-… (OpenAI-compatible, stored locally)" />
+            <p class="panel-note" style="padding:6px 0 10px">Leave empty to use the curated offline packs. With a key, any topic is generated live.</p>
+
+            <button class="btn primary" id="learn-generate" style="width:100%;justify-content:center"><svg class="ic"><use href="#i-spark"/></svg>Generate roadmap</button>
+            <div class="learn-status" id="learn-status"></div>
+
+            <div class="panel-head" style="padding-top:14px"><span>Curated offline topics</span></div>
+            <div class="learn-suggest" id="learn-suggest"></div>
+          </aside>
+
+          <div class="learn-body" id="learn-body">
+            <div class="learn-empty">
+              <svg class="ic big"><use href="#i-book"/></svg>
+              <b>No roadmap yet</b>
+              <p>Type a topic and choose a level, then generate. Each topic is explained line by line, with how it works, why it is needed, and references.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════ 01 · GRAPH ══════ -->
+      <section class="view is-active" data-view="graph">
+        <div class="view-head">
+          <div class="vh-l">
+            <p class="eyebrow"><span class="live"></span> System intelligence · live twin</p>
+            <h1>Your knowledge is a <span class="grad">structure</span>, not a list.</h1>
+            <p class="sub">Every node is a concept. Colour is memory. Motion is risk. Drag to orbit, scroll to dive.</p>
+          </div>
+          <div class="vh-r">
+            <button class="btn ghost" id="btn-roots"><svg class="ic"><use href="#i-route"/></svg>Trace root bottleneck</button>
+            <button class="btn ghost" id="btn-recenter"><svg class="ic"><use href="#i-target"/></svg>Re-centre</button>
+            <button class="btn primary" id="btn-forecast"><svg class="ic"><use href="#i-spark"/></svg>Forecast decay</button>
+          </div>
+        </div>
+
+        <div class="graph-grid">
+          <aside class="panel intel">
+            <div class="panel-head"><span>System state</span><span class="tag-mini">live</span></div>
+            <div class="kpis">
+              <div class="kpi"><b id="kpi-mastery">61%</b><small>mastery index</small><div class="spark" id="spark-m"></div></div>
+              <div class="kpi"><b id="kpi-retention">54%</b><small>mean retention</small><div class="spark" id="spark-r"></div></div>
+              <div class="kpi warn"><b id="kpi-bottle">5</b><small>bottlenecks</small><i class="pulse-dot"></i></div>
+              <div class="kpi"><b id="kpi-review">3</b><small>reviews due</small></div>
+            </div>
+
+            <div class="tm">
+              <div class="tm-head"><span><svg class="ic"><use href="#i-clock"/></svg> Concept time-machine</span><b id="tm-day">Day 0</b></div>
+              <input type="range" id="tm-range" min="0" max="120" value="0" step="1" />
+              <div class="tm-scale"><span>now</span><span>+30d</span><span>+60d</span><span>+90d</span><span>+120d</span></div>
+              <p class="tm-note" id="tm-note">Scrub forward to watch retention decay propagate through dependent concepts.</p>
+            </div>
+
+            <div class="legend">
+              <div class="panel-head"><span>Semantics</span></div>
+              <div class="lg"><i class="sw green"></i>Mastered <span>≥ 70%</span></div>
+              <div class="lg"><i class="sw amber"></i>Decaying <span>retention &lt; 60%</span></div>
+              <div class="lg"><i class="sw red pulse"></i>Bottleneck <span>blocking dependents</span></div>
+              <div class="lg"><i class="sw violet"></i>Learning <span>in progress</span></div>
+            </div>
+
+            <div class="bottleneck-list" id="bottleneck-list"></div>
+          </aside>
+
+          <div class="canvas-wrap" id="graph-wrap">
+            <canvas id="graph-canvas"></canvas>
+            <div class="graph-hud top">
+              <div class="hud-chip"><span class="dot"></span><span id="hud-nodes">36 concepts</span></div>
+              <div class="hud-chip">30 DOF · perspective</div>
+            </div>
+            <div class="graph-tooltip" id="graph-tip"></div>
+            <div class="graph-hud bottom">
+              <div class="orbit-hint">drag · orbit <i></i> scroll · zoom <i></i> click · inspect</div>
+              <button class="mini-btn" id="autorotate" aria-pressed="true"><span class="dot"></span>auto-orbit</button>
+            </div>
+            <div class="scanline" aria-hidden="true"></div>
+          </div>
+
+          <aside class="panel inspector" id="inspector">
+            <div class="panel-head"><span>Node inspector</span><button class="x-btn" id="inspect-close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+            <div id="inspect-body" class="inspect-empty">
+              <svg class="ic big"><use href="#i-graph"/></svg>
+              <b>No node selected</b>
+              <p>Click any sphere to read its mastery, memory half-life and dependency ancestry.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ══════ 02 · STUDY ══════ -->
+      <section class="view" data-view="study">
+        <div class="view-head">
+          <div class="vh-l">
+            <p class="eyebrow"><span class="live"></span> Core study deck · parameterised</p>
+            <h1>Turn the knobs. <span class="grad">Watch the law bend.</span></h1>
+            <p class="sub">Sliders rewrite the equations and the geometry simultaneously. Flip any concept into a structural analogy.</p>
+          </div>
+          <div class="vh-r">
+            <div class="seg" id="mode-seg">
+              <button class="is-active" data-mode="intuition">Intuition</button>
+              <button data-mode="analogy">Structural analogy</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="concept-strip" id="concept-strip"></div>
+
+        <div class="study-grid">
+          <div class="panel deck" id="deck">
+            <div class="deck-head">
+              <div class="deck-title">
+                <span class="node-chip" id="deck-node-chip"><i></i></span>
+                <div><p id="deck-kicker">Physics · Tier 3</p><h2 id="deck-title">Rotational dynamics</h2></div>
+              </div>
+              <div class="deck-meta">
+                <div class="meta-item"><small>mastery</small><b id="deck-mastery">41%</b></div>
+                <div class="meta-item"><small>retention</small><b id="deck-retention">37%</b></div>
+                <div class="meta-item"><small>half-life</small><b id="deck-hl">12d</b></div>
+              </div>
+            </div>
+
+            <div class="sim-stage">
+              <canvas id="sim-canvas"></canvas>
+              <div class="sim-badge" id="sim-badge">live solve</div>
+              <div class="sim-readout" id="sim-readout"></div>
+            </div>
+
+            <div class="deck-body">
+              <div class="param-panel">
+                <div class="panel-head"><span><svg class="ic"><use href="#i-sliders"/></svg> Live parameters</span><span class="tag-mini" id="param-count">4 DOF</span></div>
+                <div id="param-list"></div>
+              </div>
+              <div class="explain-panel">
+                <div class="panel-head"><span id="explain-label">Concept</span><span class="tag-mini" id="mode-tag">intuition</span></div>
+                <div class="explain-body" id="explain-body"></div>
+                <div class="eq-stack" id="eq-stack"></div>
+                <div class="deck-actions">
+                  <button class="btn primary" id="deck-review"><svg class="ic"><use href="#i-check"/></svg>Log review · reschedule</button>
+                  <button class="btn ghost" id="deck-arena"><svg class="ic"><use href="#i-terminal"/></svg>Test this concept</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="side-stack">
+            <div class="panel sched">
+              <div class="panel-head"><span>Custom review windows</span></div>
+              <div class="sched-clock">
+                <div class="ring" id="sched-ring"><span id="sched-ring-txt">3</span></div>
+                <div><b id="sched-next">next window in 6h</b><p>decay curve, not a calendar</p></div>
+              </div>
+              <div id="review-list" class="review-list"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><span>Neuro-symbolic check</span></div>
+              <p class="panel-note">Every answer is verified by pattern coherence <b>and</b> symbolic equivalence — no hallucinated grading.</p>
+              <div class="ns-demo" id="ns-demo">
+                <div class="ns-row"><span>pattern classifier</span><i class="ok"></i></div>
+                <div class="ns-row"><span>symbolic verifier</span><i class="ok"></i></div>
+                <div class="ns-row"><span>hallucination guard</span><i class="ok"></i></div>
+              </div>
+              <div class="code-inline"><code>verify(user) ≡ oracle ± ε</code></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ══════ 03 · ARENA ══════ -->
+      <section class="view" data-view="arena">
+        <div class="view-head compact">
+          <div class="vh-l">
+            <p class="eyebrow"><span class="live"></span> Dynamic testing arena · adaptive</p>
+            <h1 id="arena-title">Projectile over a cliff</h1>
+            <p class="sub" id="arena-sub">Semantic grading · step-level diagnostics · fatigue-aware difficulty</p>
+          </div>
+          <div class="vh-r">
+            <div class="arena-hud">
+              <div class="ahud"><small>predicted success</small><b id="pred">—</b><div class="meter"><i id="pred-fill" style="width:0%"></i></div></div>
+              <div class="ahud"><small>step</small><b id="step-count">1 / 4</b></div>
+              <div class="ahud"><small>time</small><b id="arena-clock">00:00</b></div>
+              <div class="ahud"><small>difficulty</small><b id="diff-label">0.55</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="arena-grid">
+          <!-- LEFT -->
+          <div class="panel prompt-pane">
+            <div class="pane-head">
+              <span class="tag" id="arena-tag">Physics · adaptive</span>
+              <div class="hint-slider-wrap">
+                <span><svg class="ic"><use href="#i-spark"/></svg>Hint peel</span>
+                <input type="range" id="hint-range" min="0" max="5" value="0" step="1" />
+                <b id="hint-level">0/5</b>
+              </div>
+            </div>
+
+            <div class="prompt-body" id="prompt-body"></div>
+
+            <div class="hint-out" id="hint-out"></div>
+
+            <div class="steps" id="steps-list"></div>
+
+            <div class="pane-foot">
+              <button class="btn ghost" id="arena-skip">Skip concept</button>
+              <button class="btn ghost" id="arena-synth"><svg class="ic"><use href="#i-spark"/></svg>Synthetic deficit drill</button>
+              <div class="flex-sp"></div>
+              <div class="adaptive-chip" id="adaptive-chip"><span class="dot"></span>difficulty auto-scaling</div>
+              <button class="btn primary" id="arena-finish">Finish attempt <svg class="ic"><use href="#i-arrow"/></svg></button>
+            </div>
+          </div>
+
+          <!-- RIGHT -->
+          <div class="panel scratch-pane">
+            <div class="pane-head">
+              <span class="tag">scratchpad · terminal</span>
+              <div class="pad-tools">
+                <button class="mini-btn is-active" data-lang="js">JS</button>
+                <button class="mini-btn" data-lang="py">Py</button>
+                <button class="mini-btn" id="pad-clear">clear</button>
+              </div>
+            </div>
+
+            <div class="pad-wrap">
+              <div class="gutter" id="gutter"></div>
+              <div class="pad-stack">
+                <div class="pad-highlight" id="pad-highlight" aria-hidden="true"></div>
+                <textarea id="pad" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="// scratchpad — write your working here
+// step answers can be typed here, then sent left"></textarea>
+              </div>
+            </div>
+
+            <div class="diag-bar" id="diag-bar">
+              <span class="diag-ok"><svg class="ic"><use href="#i-check"/></svg> syntax clean</span>
+              <span class="diag-dim">0 lines · 0 tokens</span>
+              <div class="flex-sp"></div>
+              <button class="mini-btn" id="pad-send">send selection <svg class="ic"><use href="#i-arrow"/></svg></button>
+            </div>
+
+            <div class="inline-errors" id="inline-errors"></div>
+
+            <div class="strain">
+              <div class="strain-head"><span><svg class="ic"><use href="#i-pulse"/></svg> Frustration &amp; fatigue</span><b id="strain-label">calm</b></div>
+              <div class="strain-bar"><i id="strain-fill" style="width:12%"></i><u class="thresh"></u></div>
+              <div class="strain-meta"><span id="strain-cpm">0 keys/min</span><span id="strain-pause">no long pauses</span><span id="strain-bs">0% backspace</span></div>
+              <p class="strain-note" id="strain-note">Cadence model watches rhythm, not content. When strain crosses the threshold, complexity steps down automatically.</p>
+            </div>
+
+            <div class="bug-tags">
+              <div class="panel-head"><span>Cognitive bug tags</span><span class="tag-mini" id="bug-count">0</span></div>
+              <div id="bug-tag-list" class="bug-list"><p class="empty-note">No logic gaps stamped yet. Mistakes will be classified, not just counted.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════ 04 · VAULT ══════ -->
+      <section class="view" data-view="vault">
+        <div class="view-head compact">
+          <div class="vh-l">
+            <p class="eyebrow"><span class="live"></span> Exam archive vault · verified papers</p>
+            <h1>Rehearse against the <span class="grad">real thing</span>.</h1>
+            <p class="sub">Filter by year block, stream, topic and difficulty, then launch a simulation with the original time constraint.</p>
+          </div>
+          <div class="vh-r"><button class="btn primary" id="vault-random"><svg class="ic"><use href="#i-bolt"/></svg>Surprise me</button></div>
+        </div>
+
+        <div class="panel vault-filters">
+          <div class="filter-row">
+            <label class="search-field">
+              <svg class="ic"><use href="#i-search"/></svg>
+              <input id="vault-search" placeholder="Search paper, year, topic…" />
+            </label>
+            <div class="seg small" id="year-seg">
+              <button class="is-active" data-year="all">All years</button>
+              <button data-year="2015-2018">2015–18</button>
+              <button data-year="2019-2022">2019–22</button>
+              <button data-year="2023-2026">2023–26</button>
+            </div>
+            <select id="stream-select" class="select">
+              <option value="all">All streams</option>
+              <option>Physics</option><option>Mathematics</option><option>Computer Science</option><option>Full syllabus</option>
+            </select>
+            <select id="diff-select" class="select">
+              <option value="all">Any difficulty</option>
+              <option value="easy">Foundational</option>
+              <option value="mid">Competitive</option>
+              <option value="hard">Elite</option>
+            </select>
+            <select id="sort-select" class="select">
+              <option value="year-desc">Newest first</option>
+              <option value="year-asc">Oldest first</option>
+              <option value="difficulty-desc">Hardest first</option>
+              <option value="difficulty-asc">Easiest first</option>
+              <option value="duration-desc">Longest first</option>
+              <option value="exam-asc">By exam name</option>
+            </select>
+          </div>
+          <div class="filter-row chips" id="topic-chips"></div>
+          <div class="vault-stats">
+            <span><b id="vault-count">0</b> papers matched</span>
+            <span>avg difficulty <b id="vault-avg">—</b></span>
+            <span>blueprint coverage <b id="vault-cov">—</b></span>
+            <div class="flex-sp"></div>
+            <button class="mini-btn" id="vault-reset">reset filters</button>
+          </div>
+        </div>
+
+        <div class="panel vault-table-wrap">
+          <table class="vault-table">
+            <thead>
+              <tr><th>Exam</th><th>Year</th><th>Paper</th><th>Stream</th><th>Topic blueprint</th><th>Duration</th><th>Difficulty</th><th></th></tr>
+            </thead>
+            <tbody id="vault-body"></tbody>
+          </table>
+          <div class="vault-empty" id="vault-empty">No papers match those filters.</div>
+        </div>
+      </section>
+
+      <!-- ══════ 05 · DIAGNOSTICS ══════ -->
+      <section class="view" data-view="diag">
+        <div class="view-head">
+          <div class="vh-l">
+            <p class="eyebrow"><span class="live"></span> Diagnostics · model of you</p>
+            <h1>The tutor's <span class="grad">internal opinion</span> of your brain.</h1>
+            <p class="sub">Prediction, decay forecasting, cognitive bug distribution and review-window scheduling.</p>
+          </div>
+          <div class="vh-r"><button class="btn ghost" id="diag-export"><svg class="ic"><use href="#i-archive"/></svg>Export profile</button></div>
+        </div>
+
+        <div class="diag-grid">
+          <div class="panel chart-card">
+            <div class="panel-head"><span>Subject mastery radar</span><span class="tag-mini">3 axes</span></div>
+            <canvas id="radar-canvas"></canvas>
+            <div class="chart-legend"><span><i class="sw green"></i>mastery</span><span><i class="sw cyan"></i>retention</span></div>
+          </div>
+
+          <div class="panel chart-card">
+            <div class="panel-head"><span>Retention decay · selected concept</span><span class="tag-mini" id="decay-node">—</span></div>
+            <canvas id="decay-canvas"></canvas>
+            <div class="chart-legend"><span><i class="sw amber"></i>projected</span><span><i class="sw red"></i>review window</span></div>
+          </div>
+
+          <div class="panel chart-card small">
+            <div class="panel-head"><span>Prediction accuracy</span></div>
+            <div class="calib" id="calib"></div>
+            <p class="panel-note">Model calibrated on <b id="calib-n">—</b> attempts. Brier score <b id="calib-brier">—</b>.</p>
+          </div>
+
+          <div class="panel chart-card small">
+            <div class="panel-head"><span>Cognitive bug distribution</span></div>
+            <div class="bug-bars" id="bug-bars"></div>
+          </div>
+
+          <div class="panel chart-card small synth-card">
+            <div class="panel-head"><span>Generative synthetic deficit</span><span class="tag-mini">adversarial</span></div>
+            <div class="synth-box" id="synth-preview"></div>
+            <button class="btn primary synth-btn" id="synth-run"><svg class="ic"><use href="#i-spark"/></svg>Synthesise drill</button>
+          </div>
+
+          <div class="panel chart-card wide">
+            <div class="panel-head"><span>Custom review windows · scheduled by decay</span><button class="mini-btn" id="diag-review-all">review all due</button></div>
+            <div class="review-table" id="review-table"></div>
+          </div>
+
+          <div class="panel chart-card wide">
+            <div class="panel-head"><span>Root bottleneck trace log</span><span class="tag-mini">ancestry</span></div>
+            <div class="trace-log" id="trace-log"><p class="empty-note">Run the arena to generate ancestry traces.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════ 06 · MESH ══════ -->
+      <section class="view" data-view="mesh">
+        <div class="view-head">
+          <div class="vh-l">
+            <p class="eyebrow"><span class="live"></span> Zero-knowledge peer mesh · local only</p>
+            <h1>Compete without <span class="grad">surrendering data</span>.</h1>
+            <p class="sub">Peers are discovered over a local broadcast channel. Only salted, hashed aggregates ever leave your profile.</p>
+          </div>
+          <div class="vh-r">
+            <button class="btn ghost" id="mesh-sim"><svg class="ic"><use href="#i-spark"/></svg>Spawn simulated peer</button>
+            <button class="btn primary" id="mesh-tab"><svg class="ic"><use href="#i-mesh"/></svg>Open real peer tab</button>
+          </div>
+        </div>
+
+        <div class="mesh-grid">
+          <div class="panel me-card">
+            <div class="panel-head"><span>This device</span><span class="tag-mini ok">broadcasting</span></div>
+            <div class="me-row">
+              <span class="avatar lg" id="me-avatar">AR</span>
+              <div><b id="me-alias">aarav-node</b><small id="me-fingerprint">fingerprint ······</small></div>
+            </div>
+            <div class="me-stats">
+              <div><small>mastery</small><b id="me-mastery">—</b></div>
+              <div><small>streak</small><b id="me-streak">—</b></div>
+              <div><small>mesh packets</small><b id="me-packets">0</b></div>
+            </div>
+            <div class="hash-box"><code id="me-hash">sha256(aggregate ∥ salt) = …</code></div>
+            <p class="panel-note">Nothing readable is transmitted: no answers, no question history, no identifiers.</p>
+          </div>
+
+          <div class="panel peers-panel">
+            <div class="panel-head"><span>Discovered peers</span><span class="tag-mini" id="peer-count">0 online</span></div>
+            <div class="peer-grid" id="peer-grid"></div>
+          </div>
+
+          <div class="panel packet-panel">
+            <div class="panel-head"><span>Mesh packet log</span><span class="tag-mini">broadcast</span></div>
+            <div class="packet-log" id="packet-log"></div>
+          </div>
+
+          <div class="panel streak-panel">
+            <div class="panel-head"><span>Study streak · monthly</span><span class="tag-mini" id="streak-month"></span></div>
+            <div class="streak-calendar" id="streak-calendar"></div>
+            <div class="streak-stats" id="streak-stats"></div>
+          </div>
+
+          <div class="panel arch-panel">
+            <div class="panel-head"><span>Why it is zero-knowledge</span></div>
+            <div class="arch">
+              <div class="arch-node">your profile<small>localStorage</small></div>
+              <i class="arch-line"></i>
+              <div class="arch-node accent">hash + salt<small>WebCrypto</small></div>
+              <i class="arch-line"></i>
+              <div class="arch-node">broadcast channel<small>no server</small></div>
+              <i class="arch-line"></i>
+              <div class="arch-node">peer comparison<small>aggregates only</small></div>
+            </div>
+            <p class="panel-note">Open a second tab to see two genuine nodes negotiate. Simulated peers are clearly labelled and never mutate your data.</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- ══════ COMMAND PALETTE ══════ -->
+<div class="overlay" id="palette" hidden>
+  <div class="palette-box">
+    <div class="palette-input">
+      <svg class="ic"><use href="#i-search"/></svg>
+      <input id="palette-input" placeholder="Jump to a concept, paper, view or action…" />
+      <kbd>esc</kbd>
+    </div>
+    <div class="palette-results" id="palette-results"></div>
+    <div class="palette-foot"><span><kbd>↑</kbd><kbd>↓</kbd> navigate</span><span><kbd>↵</kbd> open</span><span>AXIOM command layer</span></div>
+  </div>
+</div>
+
+<!-- ══════ PROFILE SHEET ══════ -->
+<div class="overlay sheet-overlay" id="profile-sheet" hidden>
+  <div class="sheet">
+    <div class="sheet-head">
+      <div><p class="eyebrow">Learner profile</p><h2>Aarav Raghavan</h2></div>
+      <button class="x-btn" data-close="profile-sheet"><svg class="ic"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="sheet-body" id="sheet-body"></div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toasts"></div>
+
+<script src="js/packs.js?v=2"></script>
+<script src="js/data.js?v=2"></script>
+<script src="js/core.js?v=2"></script>
+<script src="js/graph.js?v=2"></script>
+<script src="js/study.js?v=2"></script>
+<script src="js/arena.js?v=2"></script>
+<script src="js/vault.js?v=2"></script>
+<script src="js/diag.js?v=2"></script>
+<script src="js/mesh.js?v=2"></script>
+<script src="js/learn.js?v=2"></script>
+<script src="js/main.js?v=2"></script>
+</body>
+</html>
